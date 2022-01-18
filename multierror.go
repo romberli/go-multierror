@@ -3,6 +3,14 @@ package multierror
 import (
 	"errors"
 	"fmt"
+	"io"
+
+	perr "github.com/pingcap/errors"
+)
+
+const (
+	multiErrorStartString    = "==========multi error: print number %d started==========\n"
+	multiErrorCompleteString = "\n==========multi error: print number %d completed==========\n"
 )
 
 // Error is an error type to track multiple errors. This is used to
@@ -85,6 +93,33 @@ func (e *Error) Unwrap() error {
 // Errors returns the error list, it implements Errors interface of github.com/pingcap/errors
 func (e *Error) Errors() []error {
 	return e.Errs
+}
+
+// Format implements fmt.Formatter interface
+func (e *Error) Format(s fmt.State, verb rune) {
+	switch verb {
+	case 'v':
+		if s.Flag('+') {
+			_, _ = io.WriteString(s, fmt.Sprintf("multi error: %d errors occurred.\n", len(e.Errs)))
+
+			for i, err := range e.WrappedErrors() {
+				_, _ = io.WriteString(s, fmt.Sprintf(multiErrorStartString, i))
+
+				_, _ = io.WriteString(s, err.Error())
+				if perr.HasStack(err) {
+					perr.GetStackTracer(err).StackTrace().Format(s, verb)
+				}
+				_, _ = io.WriteString(s, fmt.Sprintf(multiErrorCompleteString, i))
+			}
+
+			return
+		}
+		fallthrough
+	case 's':
+		_, _ = io.WriteString(s, e.Error())
+	case 'q':
+		_, _ = fmt.Fprintf(s, "%q", e.Error())
+	}
 }
 
 // chain implements the interfaces necessary for errors.Is/As/Unwrap to
