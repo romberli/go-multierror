@@ -9,13 +9,13 @@ import (
 
 func TestFlatten(t *testing.T) {
 	original := &Error{
-		Errors: []error{
+		Errs: []error{
 			errors.New("one"),
 			&Error{
-				Errors: []error{
+				Errs: []error{
 					errors.New("two"),
 					&Error{
-						Errors: []error{
+						Errs: []error{
 							errors.New("three"),
 						},
 					},

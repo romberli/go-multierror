@@ -8,7 +8,7 @@ import (
 // Error is an error type to track multiple errors. This is used to
 // accumulate errors in cases and return them as a single "error".
 type Error struct {
-	Errors      []error
+	Errs        []error
 	ErrorFormat ErrorFormatFunc
 }
 
@@ -18,7 +18,7 @@ func (e *Error) Error() string {
 		fn = ListFormatFunc
 	}
 
-	return fn(e.Errors)
+	return fn(e.Errs)
 }
 
 // ErrorOrNil returns an error interface if this Error represents
@@ -29,7 +29,7 @@ func (e *Error) ErrorOrNil() error {
 	if e == nil {
 		return nil
 	}
-	if len(e.Errors) == 0 {
+	if len(e.Errs) == 0 {
 		return nil
 	}
 
@@ -45,18 +45,18 @@ func (e *Error) GoString() string {
 // can be used with that library.
 //
 // This method is not safe to be called concurrently. Unlike accessing the
-// Errors field directly, this function also checks if the multierror is nil to
+// Errs field directly, this function also checks if the multierror is nil to
 // prevent a null-pointer panic. It satisfies the errwrap.Wrapper interface.
 func (e *Error) WrappedErrors() []error {
 	if e == nil {
 		return nil
 	}
-	return e.Errors
+	return e.Errs
 }
 
 // Unwrap returns an error from Error (or nil if there are no errors).
 // This error returned will further support Unwrap to get the next error,
-// etc. The order will match the order of Errors in the multierror.Error
+// etc. The order will match the order of Errs in the multierror.Error
 // at the time of calling.
 //
 // The resulting error supports errors.As/Is/Unwrap so you can continue
@@ -67,19 +67,24 @@ func (e *Error) WrappedErrors() []error {
 // Unwrap is called on the multierror.Error.
 func (e *Error) Unwrap() error {
 	// If we have no errors then we do nothing
-	if e == nil || len(e.Errors) == 0 {
+	if e == nil || len(e.Errs) == 0 {
 		return nil
 	}
 
 	// If we have exactly one error, we can just return that directly.
-	if len(e.Errors) == 1 {
-		return e.Errors[0]
+	if len(e.Errs) == 1 {
+		return e.Errs[0]
 	}
 
 	// Shallow copy the slice
-	errs := make([]error, len(e.Errors))
-	copy(errs, e.Errors)
+	errs := make([]error, len(e.Errs))
+	copy(errs, e.Errs)
 	return chain(errs)
+}
+
+// Errors returns the error list, it implements Errors interface of github.com/pingcap/errors
+func (e *Error) Errors() []error {
+	return e.Errs
 }
 
 // chain implements the interfaces necessary for errors.Is/As/Unwrap to

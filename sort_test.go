@@ -15,13 +15,13 @@ func TestSortSingle(t *testing.T) {
 	}
 
 	err := &Error{
-		Errors: []error{
+		Errs: []error{
 			errFoo,
 		},
 	}
 
 	sort.Sort(err)
-	if !reflect.DeepEqual(err.Errors, expected) {
+	if !reflect.DeepEqual(err.Errs, expected) {
 		t.Fatalf("bad: %#v", err)
 	}
 }
@@ -38,7 +38,7 @@ func TestSortMultiple(t *testing.T) {
 	}
 
 	err := &Error{
-		Errors: []error{
+		Errs: []error{
 			errFoo,
 			errBar,
 			errBaz,
@@ -46,7 +46,7 @@ func TestSortMultiple(t *testing.T) {
 	}
 
 	sort.Sort(err)
-	if !reflect.DeepEqual(err.Errors, expected) {
+	if !reflect.DeepEqual(err.Errs, expected) {
 		t.Fatalf("bad: %#v", err)
 	}
 }

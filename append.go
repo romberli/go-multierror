@@ -21,11 +21,11 @@ func Append(err error, errs ...error) *Error {
 			switch e := e.(type) {
 			case *Error:
 				if e != nil {
-					err.Errors = append(err.Errors, e.Errors...)
+					err.Errs = append(err.Errs, e.Errs...)
 				}
 			default:
 				if e != nil {
-					err.Errors = append(err.Errors, e)
+					err.Errs = append(err.Errs, e)
 				}
 			}
 		}

@@ -7,11 +7,11 @@ import (
 
 func TestPrefix_Error(t *testing.T) {
 	original := &Error{
-		Errors: []error{errors.New("foo")},
+		Errs: []error{errors.New("foo")},
 	}
 
 	result := Prefix(original, "bar")
-	if result.(*Error).Errors[0].Error() != "bar foo" {
+	if result.(*Error).Errs[0].Error() != "bar foo" {
 		t.Fatalf("bad: %s", result)
 	}
 }

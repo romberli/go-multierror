@@ -26,8 +26,8 @@ func Prefix(err error, prefix string) error {
 		}
 
 		// Wrap each of the errors
-		for i, e := range err.Errors {
-			err.Errors[i] = errwrap.Wrapf(format, e)
+		for i, e := range err.Errs {
+			err.Errs[i] = errwrap.Wrapf(format, e)
 		}
 
 		return err

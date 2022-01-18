@@ -1,6 +1,6 @@
 package multierror
 
-// Flatten flattens the given error, merging any *Errors together into
+// Flatten flattens the given error, merging any *Errs together into
 // a single *Error.
 func Flatten(err error) error {
 	// If it isn't an *Error, just return the error as-is
@@ -17,10 +17,10 @@ func Flatten(err error) error {
 func flatten(err error, flatErr *Error) {
 	switch err := err.(type) {
 	case *Error:
-		for _, e := range err.Errors {
+		for _, e := range err.Errs {
 			flatten(e, flatErr)
 		}
 	default:
-		flatErr.Errors = append(flatErr.Errors, err)
+		flatErr.Errs = append(flatErr.Errs, err)
 	}
 }
